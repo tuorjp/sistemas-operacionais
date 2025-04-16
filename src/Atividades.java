@@ -1,46 +1,66 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Atividades {
     public static void main(String[] args) {
-        int simulacao;
+        int simulacao = -1;
 
         System.out.println("Selecione uma simulação: \n");
         System.out.println(
                 """
-                1 - Execução monoprogramada\s
-                2 - Execução multiprogramada\s
-                3 - Simulação de interrupções de um processo\s
+                1 - Execução monoprogramada
+                2 - Execução multiprogramada
+                3 - Simulação de interrupções de um processo
                 """
         );
 
         Scanner scan = new Scanner(System.in);
 
-        simulacao = -1;
+        while(true) {
+            while (simulacao < 0 || simulacao > 3) {
+                System.out.print("Digite o número da simulação (0, 1, 2 ou 3): ");
+                if (scan.hasNextInt()) {
+                    simulacao = scan.nextInt();
 
-        while (simulacao < 1 || simulacao > 3) {
-            System.out.print("Digite o número da simulação (1, 2 ou 3): ");
-            if (scan.hasNextInt()) {
-                simulacao = scan.nextInt();
-
-                if (simulacao < 1 || simulacao > 3) {
-                    System.out.println("Número inválido. Por favor, escolha entre 1, 2 ou 3.");
+                    if (simulacao < 0 || simulacao > 3) {
+                        System.out.println("Número inválido. Por favor, escolha entre 0, 1, 2 ou 3.");
+                    }
+                } else {
+                    System.out.println("Por favor, insira um número inteiro válido.");
+                    scan.next();
                 }
-            } else {
-                System.out.println("Por favor, insira um número inteiro válido.");
-                scan.next();
             }
-        }
 
-        switch (simulacao) {
-            case 1:
-                Simulador.simularMonoProgramavel();
-                break;
-            case 2:
-                Simulador.simularMultiProgramavel();
-                break;
-            case 3:
-                Simulador.simularInterrupcoesDeUmProcesso();
-                break;
+            switch (simulacao) {
+                case 0:
+                    System.out.println("Encerrando o programa...");
+                    scan.close();
+                    return;
+                case 1:
+                    Simulador.simularMonoProgramavel();
+                    break;
+                case 2:
+                    Simulador.simularMultiProgramavel();
+                    break;
+                case 3:
+                    Simulador.simularInterrupcoesDeUmProcesso();
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + simulacao);
+            }
+
+            simulacao = -1;
+        }
+    }
+
+    public static void setTimeoutSync(Runnable runnable, int delay) {
+        try {
+            Thread.sleep(delay);
+            runnable.run();
+        }
+        catch (Exception e){
+            System.err.println(e);
         }
     }
 }
@@ -61,7 +81,19 @@ class Processo {
 
 class Simulador {
     public static void simularMonoProgramavel() {
+        List<Processo> processosMonoProgramaveis = new ArrayList<>();
+        processosMonoProgramaveis.add(new Processo("Processo 1 - Processar cálculo", 1*1000));
+        processosMonoProgramaveis.add(new Processo("Processo 2 - Ler arquivo", 2*1000));
+        processosMonoProgramaveis.add(new Processo("Processo 3 - Gravar arquivo", 2*1000));
 
+        System.out.println("Iniciando processamento mono:");
+
+        processosMonoProgramaveis.forEach((processo) -> {
+            Atividades.setTimeoutSync(
+                    () -> System.out.println(processo.nome),
+                    processo.seconds
+            );
+        });
     }
 
     public static void simularMultiProgramavel() {
