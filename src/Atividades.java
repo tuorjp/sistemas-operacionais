@@ -56,7 +56,8 @@ public class Atividades {
 
     public static void setTimeoutSync(Runnable runnable, int delay) {
         try {
-            Thread.sleep(delay);
+            // Converte para milissegundos, que é o tipo de argumento da função
+            Thread.sleep(delay * 1000);
             runnable.run();
         }
         catch (Exception e){
@@ -82,9 +83,9 @@ class Processo {
 class Simulador {
     public static void simularMonoProgramavel() {
         List<Processo> processosMonoProgramaveis = new ArrayList<>();
-        processosMonoProgramaveis.add(new Processo("Processo 1 - Processar cálculo", 1*1000));
-        processosMonoProgramaveis.add(new Processo("Processo 2 - Ler arquivo", 2*1000));
-        processosMonoProgramaveis.add(new Processo("Processo 3 - Gravar arquivo", 2*1000));
+        processosMonoProgramaveis.add(new Processo("Processo 1 - Processar cálculo", 1));
+        processosMonoProgramaveis.add(new Processo("Processo 2 - Ler arquivo", 2));
+        processosMonoProgramaveis.add(new Processo("Processo 3 - Gravar arquivo", 2));
 
         System.out.println("Iniciando processamento mono:");
 
