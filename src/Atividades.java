@@ -54,7 +54,7 @@ public class Atividades {
         }
     }
 
-    public static void setTimeoutSync(Runnable runnable, int delay) {
+    public static void simularTempoDeExecucao(Runnable runnable, int delay) {
         try {
             // Converte para milissegundos, que é o tipo de argumento da função
             Thread.sleep(delay * 1000);
@@ -70,13 +70,33 @@ class Processo {
     public String nome;
     public Integer seconds;
 
-    public Processo(String nome) {
-        this.nome = nome;
-    }
-
     public Processo(String nome, Integer seconds) {
         this.nome = nome;
         this.seconds = seconds;
+    }
+}
+
+class ProcessoParalelo extends Thread {
+    private final String nome;
+    private final int duracao;
+
+    public ProcessoParalelo(String nome, int duracao) {
+        this.nome = nome;
+        this.duracao = duracao;
+    }
+
+    @Override
+    public void run() {
+        System.out.println(nome + " iniciado.");
+        try {
+            for (int i = 0; i < duracao; i++) {
+                System.out.println(nome + " executando... " + i + "s");
+                Thread.sleep(1000); // um segundo de trabalho simulado
+            }
+        } catch (InterruptedException e) {
+            System.out.println(nome + " foi interrompido.");
+        }
+        System.out.println(nome + " finalizado");
     }
 }
 
@@ -90,7 +110,7 @@ class Simulador {
         System.out.println("Iniciando processamento mono:");
 
         processosMonoProgramaveis.forEach((processo) -> {
-            Atividades.setTimeoutSync(
+            Atividades.simularTempoDeExecucao(
                     () -> System.out.println(processo.nome),
                     processo.seconds
             );
@@ -98,7 +118,23 @@ class Simulador {
     }
 
     public static void simularMultiProgramavel() {
+        System.out.println("Iniciando processamento multi:");
 
+        Thread processoA = new ProcessoParalelo("Processo A - multi", 5);
+        Thread processoB = new ProcessoParalelo("Processo B - multi", 3);
+        Thread processoC = new ProcessoParalelo("Processo C - multi", 4);
+
+        processoA.start();
+        processoB.start();
+        processoC.start();
+
+        try {
+            processoA.join();
+            processoB.join();
+            processoC.join();
+        } catch (InterruptedException e) {
+            System.out.println("Erro ao aguardar término das Threads: " + e.getMessage());
+        }
     }
 
     public static void simularInterrupcoesDeUmProcesso() {
