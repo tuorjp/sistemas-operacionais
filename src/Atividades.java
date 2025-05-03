@@ -1,7 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Atividades {
     public static void main(String[] args) {
@@ -14,18 +12,20 @@ public class Atividades {
                 2 - Execução multiprogramada
                 3 - Simulação de interrupções de um processo
                 4 - Comparar leitura de arquivos com e sem buffer
+                5 - Simular Spooling de impressão
+                6 - Teste de funções reentrantes e não reentrantes
                 """
         );
 
         Scanner scan = new Scanner(System.in);
 
         while(true) {
-            while (simulacao < 0 || simulacao > 4) {
-                System.out.print("Digite o número da simulação (0 a 4): ");
+            while (simulacao < 0 || simulacao > 6) {
+                System.out.print("Digite o número da simulação (0 a 6): ");
                 if (scan.hasNextInt()) {
                     simulacao = scan.nextInt();
 
-                    if (simulacao < 0 || simulacao > 4) {
+                    if (simulacao < 0 || simulacao > 6) {
                         System.out.println("Número inválido. Por favor, escolha entre 0 e 4.");
                     }
                 } else {
@@ -50,6 +50,12 @@ public class Atividades {
                     break;
                 case 4:
                     Simulador.compararLeituraComESemBuffer();
+                    break;
+                case 5:
+                    Simulador.simularSpoolingDeImpressao();
+                    break;
+                case 6:
+                    Simulador.simularFuncoesReentrantes();
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + simulacao);
@@ -199,6 +205,146 @@ class Simulador {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void simularSpoolingDeImpressao() {
+        SpoolerImpressao spooler = new SpoolerImpressao();
+        spooler.start();
+
+        spooler.adicionarDocumento(new Documento("Doc1", 3, 2));
+        spooler.adicionarDocumento(new Documento("Doc2", 2, 1));
+        spooler.adicionarDocumento(new Documento("Doc3", 1, 3));
+
+        try {
+            Thread.sleep(10_000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        spooler.interrupt(); // Encerra a simulação
+    }
+
+    public static void simularFuncoesReentrantes() {
+        System.out.println("Executando versão NÃO REENTRANTE:");
+        Thread t1 = new ThreadNaoReentrante();
+        Thread t2 = new ThreadNaoReentrante();
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("\nExecutando versão REENTRANTE:");
+        Thread r1 = new ThreadReentrante();
+        Thread r2 = new ThreadReentrante();
+        r1.start();
+        r2.start();
+
+        try {
+            r1.join();
+            r2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class Documento {
+    String nome;
+    int tempoProcessamento;
+    int prioridade;
+
+    public Documento(String nome, int tempoProcessamento, int prioridade) {
+        this.nome = nome;
+        this.tempoProcessamento = tempoProcessamento;
+        this.prioridade = prioridade;
+    }
+}
+
+class SpoolerImpressao extends Thread {
+    private final PriorityQueue<Documento> fila;
+
+    public SpoolerImpressao() {
+        fila = new PriorityQueue<>(Comparator.comparingInt(d -> d.prioridade));
+    }
+
+    public synchronized void adicionarDocumento(Documento doc) {
+        fila.add(doc);
+        notify(); // notifica a thread para continuar, caso esteja esperando
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            Documento doc;
+            synchronized (this) {
+                while (fila.isEmpty()) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+                doc = fila.poll();
+            }
+
+            System.out.println("Imprimindo: " + doc.nome + " (Prioridade: " + doc.prioridade + ")");
+            try {
+                Thread.sleep(doc.tempoProcessamento * 1000);
+            } catch (InterruptedException e) {
+                System.out.println("Impressão interrompida.");
+            }
+            System.out.println("Finalizado: " + doc.nome);
+        }
+    }
+}
+
+class ContadorNaoReentrante {
+    private static int contadorGlobal = 0;
+
+    public static int incrementar() {
+        int temp = contadorGlobal;
+        try {
+            Thread.sleep(50); // Simula operação demorada
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        contadorGlobal = temp + 1;
+        return contadorGlobal;
+    }
+}
+
+class ThreadNaoReentrante extends Thread {
+    public void run() {
+        for (int i = 0; i < 5; i++) {
+            int valor = ContadorNaoReentrante.incrementar();
+            System.out.println(getName() + " => Contador: " + valor);
+        }
+    }
+}
+
+class ContadorReentrante {
+    public static int incrementar(int valorAtual) {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return valorAtual + 1;
+    }
+}
+
+class ThreadReentrante extends Thread {
+    public void run() {
+        int local = 0;
+        for (int i = 0; i < 5; i++) {
+            local = ContadorReentrante.incrementar(local);
+            System.out.println(getName() + " => Contador: " + local);
         }
     }
 }
