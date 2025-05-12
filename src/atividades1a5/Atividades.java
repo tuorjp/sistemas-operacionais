@@ -1,3 +1,5 @@
+package atividades1a5;
+
 import java.io.*;
 import java.util.*;
 
@@ -113,9 +115,9 @@ class ProcessoParalelo extends Thread {
 class Simulador {
     public static void simularMonoProgramavel() {
         List<Processo> processosMonoProgramaveis = new ArrayList<>();
-        processosMonoProgramaveis.add(new Processo("Processo 1 - Processar cálculo", 1));
-        processosMonoProgramaveis.add(new Processo("Processo 2 - Ler arquivo", 2));
-        processosMonoProgramaveis.add(new Processo("Processo 3 - Gravar arquivo", 2));
+        processosMonoProgramaveis.add(new Processo("atividades1a5.Processo 1 - Processar cálculo", 1));
+        processosMonoProgramaveis.add(new Processo("atividades1a5.Processo 2 - Ler arquivo", 2));
+        processosMonoProgramaveis.add(new Processo("atividades1a5.Processo 3 - Gravar arquivo", 2));
 
         System.out.println("Iniciando processamento mono:");
 
@@ -130,9 +132,9 @@ class Simulador {
     public static void simularMultiProgramavel() {
         System.out.println("Iniciando processamento multi:");
 
-        Thread processoA = new ProcessoParalelo("Processo A - multi", 5);
-        Thread processoB = new ProcessoParalelo("Processo B - multi", 3);
-        Thread processoC = new ProcessoParalelo("Processo C - multi", 4);
+        Thread processoA = new ProcessoParalelo("atividades1a5.Processo A - multi", 5);
+        Thread processoB = new ProcessoParalelo("atividades1a5.Processo B - multi", 3);
+        Thread processoC = new ProcessoParalelo("atividades1a5.Processo C - multi", 4);
 
         processoA.start();
         processoB.start();
@@ -148,14 +150,14 @@ class Simulador {
     }
 
     public static void simularInterrupcoesDeUmProcesso() {
-        Thread processo = new ProcessoParalelo("Processo Principal", 10);
+        Thread processo = new ProcessoParalelo("atividades1a5.Processo Principal", 10);
         processo.start();
 
         Thread interrupcao = new Thread(() -> {
             try {
                 Thread.sleep(3000);
                 processo.interrupt();
-                System.out.println("Processo interrompido externamente!");
+                System.out.println("atividades1a5.Processo interrompido externamente!");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
