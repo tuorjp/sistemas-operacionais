@@ -3,19 +3,29 @@ package segunda_va;
 public class Processo implements Runnable {
     @Override
     public void run() {
+        try {
+            this.estado = "executando";
+            System.out.println("Processo " + getPID() + "; prioridade: " + getPrioridade() + " está em execução...");
+            Thread.sleep(this.tempoDeExecucao);
 
+            Thread.sleep(this.tempoDeExecucao);
+            this.estado = "Finalizado";
+            System.out.println("Processo " + getPID() + " finalizado.");
+        } catch (InterruptedException e) {
+            System.err.println("Processo " + getPID() + " foi interrompido.");
+        }
     }
 
     private String PID;
     private String estado;
     private Integer prioridade;
-    private Integer tempoDeCpu;
+    private final Integer tempoDeExecucao;
 
-    public Processo(String PID, String estado, Integer prioridade, Integer tempoDeCpu) {
+    public Processo(String PID, String estado, Integer prioridade, Integer tempoDeExecucao) {
         this.PID = PID;
         this.estado = estado;
         this.prioridade = prioridade;
-        this.tempoDeCpu = tempoDeCpu;
+        this.tempoDeExecucao = tempoDeExecucao;
     }
 
     public String getPID() {
@@ -42,24 +52,8 @@ public class Processo implements Runnable {
         this.prioridade = prioridade;
     }
 
-    public Integer getTempoDeCpu() {
-        return tempoDeCpu;
-    }
-
-    public void setTempoDeCpu(Integer tempoDeCpu) {
-        this.tempoDeCpu = tempoDeCpu;
-    }
-
-    public static void setTimeout(Runnable runnable, int delay){
-        new Thread(() -> {
-            try {
-                Thread.sleep(delay);
-                runnable.run();
-            }
-            catch (Exception e){
-                System.err.println(e);
-            }
-        }).start();
+    public Integer getTempoDeExecucao() {
+        return tempoDeExecucao;
     }
 }
 
