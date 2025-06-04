@@ -1,4 +1,6 @@
-package segunda_va;
+package segunda_va.cap7;
+
+import segunda_va.Processo;
 
 import java.util.ArrayList;
 import java.util.Comparator;
