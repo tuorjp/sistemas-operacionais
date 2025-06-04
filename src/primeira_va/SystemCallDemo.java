@@ -1,4 +1,4 @@
-package systemcalls;
+package primeira_va;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -29,7 +29,7 @@ public class SystemCallDemo {
         } else {
             System.out.println("A pasta já existe.");
         }
-        systemcalls.SystemCallUtils.criarArquivoNaPasta(pasta);
-        systemcalls.SystemCallUtils.listaArquivos(currentDir);
+        SystemCallUtils.criarArquivoNaPasta(pasta);
+        SystemCallUtils.listaArquivos(currentDir);
     }
 }

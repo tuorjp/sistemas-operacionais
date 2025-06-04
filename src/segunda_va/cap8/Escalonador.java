@@ -5,6 +5,7 @@ import segunda_va.Processo;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Escalonador {
     public static void gerenciar(List<List<Processo>> processosMatriz) {
